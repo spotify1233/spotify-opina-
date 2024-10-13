@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliação de Músicas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 20px;
+      background-color: #1DB954;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    #menu-btn {
+      background-color: transparent;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .menu button {
+      display: block;
+      margin: 5px 0;
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .music-slider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      transition: transform 0.5s ease;
+    }
+
+    .music-item {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+
+    .music-item.active {
+      display: block;
+    }
+
+    .music-item img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .rating-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .rating-buttons button {
+      width: 50px;
+      height: 50px;
+      font-size: 18px;
+      margin: 0 5px;
+      border-radius: 50%;
+      background-color: #1DB954;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .rating-buttons button:hover {
+      background-color: #1ed760;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .saque-screen, .initial-screen {
+      background-color: #1e1e1e;
+      padding: 20px;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+
+    .pix-info {
+      margin: 20px 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .message {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .earnings {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: #1DB954;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      animation: slide-up 1s ease forwards;
+    }
+
+    @keyframes slide-up {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Avalie Músicas</h1>
+    <button id="menu-btn">☰ Menu</button>
+  </header>
+
+  <div class="menu" id="menu">
+    <button onclick="showSettings()">Configurações</button>
+    <button onclick="showSaqueScreen()">Solicitar Saque</button>
+    <button onclick="showEvaluationScreen()">Avaliar Músicas</button>
+    <button onclick="showInitialScreen()">Menu Principal</button>
+  </div>
+
+  <!-- Exibir saldo ganho -->
+  <div class="earnings" id="earnings-display">Saldo: R$ 0,00</div>
+
+  <!-- Tela de Avaliação das Músicas -->
+  <div class="music-slider" id="music-slider">
+    <!-- Música 1 -->
+    <div class="music-item active" id="music-1">
+      <img src="https://i.scdn.co/image/ab67616d0000b273e155911eff3beb64eb7d157c" alt="Nois é Original - Paiva">
+    </div>
+
+    <!-- Música 2 -->
+    <div class="music-item" id="music-2">
+      <img src="https://akamai.sscdn.co/tb/letras-blog/wp-content/uploads/2022/08/3042198-mc-paiva-1024x576.jpg" alt="Afrodite">
+    </div>
+
+    <!-- Mensagem para Saque -->
+    <div class="message hidden" id="sacar-message">
+      <h3>Você avaliou todas as músicas disponíveis.</h3>
+      <p>Agora solicite seu saque clicando no botão "Solicitar Saque" no menu.</p>
+    </div>
+  </div>
+
+  <!-- Botões de Avaliação -->
+  <div class="rating-buttons">
+    <button onclick="submitRating(1)">1</button>
+    <button onclick="submitRating(2)">2</button>
+    <button onclick="submitRating(3)">3</button>
+    <button onclick="submitRating(4)">4</button>
+    <button onclick="submitRating(5)">5</button>
+  </div>
+
+  <!-- Tela de Saque -->
+  <div class="saque-screen" id="saque-screen">
+    <h2>Tela de Pagamento</h2>
+    <p>Para continuar, realize o pagamento de R$ 19,99 para a chave PIX abaixo:</p>
+    <div class="pix-info">
+      <input type="text" value="51980138064" id="pix-key" readonly>
+      <button onclick="copyPixKey()">Copiar PIX</button>
+    </div>
+    <p>Esse valor é cobrado apenas para termos uma segurança. Após o pagamento, você poderá sacar seus ganhos.</p>
+    <button onclick="closeSaqueScreen()">Fechar</button>
+  </div>
+
+  <!-- Tela de Configurações -->
+  <div class="saque-screen hidden" id="settings-screen">
+    <h2>Configurações</h2>
+    <p>Aqui você poderá alterar suas preferências futuramente.</p>
+    <button onclick="closeSettings()">Fechar</button>
+  </div>
+
+  <script>
+    let currentMusic = 1;
+    let saldo = 0;
+
+    // Atualiza o display do saldo
+    function updateEarningsDisplay() {
+      document.getElementById('earnings-display').innerText = `Saldo: R$ ${saldo.toFixed(2)}`;
+    }
+
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      const menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    function submitRating(rating) {
+      saldo += 50;  // Cada avaliação adiciona R$50 ao saldo
+      updateEarningsDisplay();  // Atualiza o saldo exibido
+
+      if (currentMusic === 1) {
+        document.getElementById('music-1').classList.remove('active');
+        document.getElementById('music-2').classList.add('active');
+        currentMusic++;
+      } else {
+        document.getElementById('music-2').classList.remove('active');
+        document.getElementById('sacar-message').classList.remove('hidden');
+      }
+    }
+
+    function showSaqueScreen() {
+      document.getElementById('saque-screen').style.display = 'block';
+    }
+
+    function closeSaqueScreen() {
+      document.getElementById('saque-screen').style.display = 'none';
+    }
+
+    function showSettings() {
+      document.getElementById('settings-screen').style.display = 'block';
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-screen').style.display = 'none';
+    }
+
+    function showInitialScreen() {
+      document.getElementById('initial-screen').style.display = 'block';
+    }
+
+    function showEvaluationScreen() {
+      document.getElementById('music-slider').style.display = 'flex'; // Mostra a tela de avaliação
+      closeInitialScreen(); // Fecha a tela inicial, se aberta
+    }
+
+    function copyPixKey() {
+      const pixKey = document.getElementById('pix-key');
+      pixKey.select();
+      document.execCommand('copy');
+      alert('Chave PIX copiada!');
+    }
+    
+    function closeInitialScreen() {
+      document.getElementById('initial-screen').style.display = 'none'; // Fecha a tela inicial
+    }
+
+    // Inicialmente, exibe a tela de avaliação
+    showEvaluationScreen();
+  </script>
+</body>
+</html>
